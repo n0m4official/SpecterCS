@@ -260,6 +260,8 @@
                             <ComboBoxItem Content="Carbon foam RAM 10mm"      Tag="CarbonFoam"/>
                             <ComboBoxItem Content="Ferrite tile 3mm"          Tag="Ferrite"/>
                             <ComboBoxItem Content="Dielectric coating 5mm"    Tag="Dielectric"/>
+                            <ComboBoxItem Content="Aluminium 20mm" Tag="Aluminium"/>
+                            <ComboBoxItem Content="Titanium Alloy 20mm" Tag="Titanium"/>
                         </ComboBox>
                         <Button Content="Apply to whole model"
                                 Style="{StaticResource ActionButton}"

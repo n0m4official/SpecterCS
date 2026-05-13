@@ -566,6 +566,8 @@ public partial class MainWindow : Window
 			"CarbonFoam" => KnownMaterials.CarbonFoam10mm,
 			"Ferrite" => KnownMaterials.FerriteTile3mm,
 			"Dielectric" => KnownMaterials.DielectricCoating5mm,
+			"Aluminium" => KnownMaterials.Aluminium,
+			"Titanium Alloy" => KnownMaterials.Titanium,
 			_ => MaterialProperties.PEC
 		};
 

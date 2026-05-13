@@ -132,7 +132,7 @@ public sealed class MaterialProperties
 }
 
 /// <summary>
-/// Predefined common RAM materials for convenience.
+/// Predefined common materials for convenience.
 /// </summary>
 public static class KnownMaterials
 {
@@ -151,4 +151,14 @@ public static class KnownMaterials
 	public static MaterialProperties DielectricCoating5mm =>
 		MaterialProperties.Ram("Dielectric coating 5mm",
 			new Complex(6.0, -1.5), 0.005);
+
+	/// Pure aluminium (highly conductive radar reflector), approximated as a lossy near-PEC at microwave frequencies.
+	public static MaterialProperties Aluminium =>
+		MaterialProperties.Ram("Aluminium",
+			new Complex(1.0, -1.0e7), 0.020);
+
+	/// Titanium alloy (conductive structural metal with higher RF losses than aluminium)
+	public static MaterialProperties Titanium =>
+		MaterialProperties.Ram("Titanium alloy",
+			new Complex(1.0, -2.5e6), 0.020);
 }

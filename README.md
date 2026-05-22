@@ -2,6 +2,9 @@
 
 ### *RCS Simulation Platform — “Reveal the Invisible.”*
 
+#### IMPORTANT TO NOTE:
+I am a full-time post-seondary student, updates and patches will be infrequent as a result. I will do my best to update and improve it as much as I can, but keep in mind that my studies are my highest priority at this time.
+
 ---
 
 ## Overview

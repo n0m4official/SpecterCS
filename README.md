@@ -151,8 +151,7 @@ Electromagnetic interaction is modeled via:
 ### Load a Model
 
 * Click **“Load OBJ / STL”**
-  * **NOTE:** OBJ files are **NOT RECOMMENDED** as they have been shown to demonstrate impossibly high return values in testing
-      * Caused by non-manifold geometry or vertex welding issues from OBJ format itself   
+  * **NOTE:** OBJ files are **not recommended**. Many OBJ models contain topology and vertex connectivity issues that can produce unrealistically large RCS values. For the most reliable results, use clean, manifold STL meshes.
 * Select a 3D mesh file
 * The system will:
 

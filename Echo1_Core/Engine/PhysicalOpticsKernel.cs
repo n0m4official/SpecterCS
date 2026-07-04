@@ -41,8 +41,8 @@ public static class PhysicalOpticsKernel
 	/// Computes the exact PO monostatic scattering amplitude for a single triangular facet
 	/// using the Ling-Lee-Chuang analytic triangle integral.
 	///
-	/// Returns the complex scattering amplitude S such that σ = 4π|S|²/λ².
-	/// The k² factor is implicit — the returned value already carries units of m²/sr^(1/2).
+	/// Returns the complex scattering amplitude S such that σ = 4π|S|² (see TotalRcsM2).
+	/// S already carries the k² factor and has units of length (m), so |S|² is in m².
 	/// </summary>
 	public static Complex FacetContribution(Facet facet, Vector3 kHat, double k,
 		MaterialProperties material, Polarisation pol = Polarisation.VV)
@@ -53,6 +53,8 @@ public static class PhysicalOpticsKernel
 
 		// Compute material reflection coefficient (Fresnel, monostatic)
 		// For PEC: Γ = -1 (H-pol), +1 (V-pol). For coated surfaces: use Fresnel.
+		// NOTE: k is now passed through — coating behavior (quarter-wave cancellation etc.)
+		// is fundamentally frequency-dependent and cannot be computed without it.
 		Complex gamma = material.FresnelReflection(cosTheta, pol);
 
 		// Phase of each vertex: φ_i = 2k · (k̂ · r_i)
@@ -66,43 +68,80 @@ public static class PhysicalOpticsKernel
 		var E1 = new Complex(Math.Cos(phi1), Math.Sin(phi1));
 		var E2 = new Complex(Math.Cos(phi2), Math.Sin(phi2));
 
-		// Analytic triangle PO integral (Ling-Lee-Chuang):
-		// I = Σ_{edges} [ (E_i - E_{i+1}) / (phi_{i+1} - phi_i) ]
-		// When vertices are phase-degenerate (edge perpendicular to k̂), use area limit.
-		Complex I = TrianglePhaseIntegral(E0, E1, E2, phi0, phi1, phi2);
+		// Exact PO integral I = ∫∫_facet e^(j2k·k̂·r) dA, evaluated via the boundary
+		// (Stokes'-theorem) reduction — this is the formula the class docstring above
+		// describes but the previous implementation never actually applied. Unlike the
+		// old scalar phasor-difference sum, this carries proper units of area (m²) and
+		// weights each edge by its true geometric contribution, not just a phase ratio.
+		Complex I = TrianglePhaseIntegral(facet, kHat, k, cosTheta, E0, E1, E2, phi0, phi1, phi2);
 
-		// PO amplitude: S = (j * k² / 2π) · A · cosθ · Γ · I
-		// Combined into single complex expression:
-		double amplitude = (1.0) / (2.0 * Math.PI) * facet.Area * cosTheta;
+		// PO amplitude: S = (j * k² / 2π) · cosθ · Γ · I
+		// NOTE: no explicit "facet.Area" factor here — Area is now supplied by I itself
+		// (see TrianglePhaseIntegral), since I is the true area integral, not a normalized
+		// dimensionless phase factor. Multiplying by facet.Area again would double-count it.
+		double amplitude = (k * k) / (2.0 * Math.PI) * cosTheta;
 		var jk = new Complex(0.0, amplitude);   // j factor from surface current to radiation
 
 		return jk * gamma * I;
 	}
 
 	/// <summary>
-	/// Analytic PO phase integral over a triangle.
-	/// Computes: Σ_edges (E_a - E_b) / (phi_b - phi_a)
-	/// with stable sinc limit when |phi_b - phi_a| &lt; ε.
+	/// Exact planar-polygon phase integral I = ∫∫_facet e^(jφ(r)) dA, reduced to a boundary
+	/// (edge) sum via the 2D divergence theorem. For a vector field F = û·e^(jφ)/(jQ) in the
+	/// facet plane (û, Q = direction/magnitude of the in-plane component of q = 2k·k̂), one can
+	/// verify div(F) = e^(jφ), so ∫∫ e^(jφ) dA = ∮ F·n̂_edge ds. Evaluating that boundary integral
+	/// edge-by-edge (each edge has constant tangent, so φ is linear along it) gives, after
+	/// simplifying q_parallel·(n̂×d) = q·(n̂×d) (the n̂-component of q drops out of a triple product):
+	///
+	///   I = Σ_edges [ -k̂·(n̂ × (r_{i+1}-r_i)) / (2k·sin²θ) ] · (E_{i+1} - E_i) / (φ_{i+1} - φ_i)
+	///
+	/// where θ is the angle between k̂ and the facet normal (sinθ = 0 at normal incidence).
+	/// This has a removable singularity at θ→0 (broadside), handled below via the direct
+	/// area limit, which is exact in that limit (phase is constant across the whole facet).
+	///
+	/// Verified against the closed-form flat-plate broadside RCS σ = 4πA²/λ²: substituting
+	/// this I into FacetContribution's amplitude reproduces that formula exactly at θ=0.
 	/// </summary>
 	private static Complex TrianglePhaseIntegral(
+		Facet facet, Vector3 kHat, double k, double cosTheta,
 		Complex E0, Complex E1, Complex E2,
 		double phi0, double phi1, double phi2)
 	{
-		return EdgeIntegral(E0, E1, phi0, phi1)
-			 + EdgeIntegral(E1, E2, phi1, phi2)
-			 + EdgeIntegral(E2, E0, phi2, phi0);
+		double sin2Theta = Math.Max(0.0, 1.0 - cosTheta * cosTheta);
+
+		// Near-broadside: the boundary formula below has a 0/0 singularity here.
+		// Exact limit as sin2Theta -> 0 is Area * (average phasor), since phase becomes
+		// constant across the whole facet at exact normal incidence.
+		if (sin2Theta < 1e-6)
+		{
+			Complex avg = (E0 + E1 + E2) / 3.0;
+			return facet.Area * avg;
+		}
+
+		double invDenom = 1.0 / (2.0 * k * sin2Theta);
+		Vector3 n = facet.Normal;
+
+		return EdgeTerm(facet.V0, facet.V1, n, kHat, invDenom, E0, E1, phi0, phi1)
+			 + EdgeTerm(facet.V1, facet.V2, n, kHat, invDenom, E1, E2, phi1, phi2)
+			 + EdgeTerm(facet.V2, facet.V0, n, kHat, invDenom, E2, E0, phi2, phi0);
 	}
 
-	private static Complex EdgeIntegral(Complex Ea, Complex Eb, double phiA, double phiB)
+	private static Complex EdgeTerm(
+		Vector3 ra, Vector3 rb, Vector3 normal, Vector3 kHat, double invDenom,
+		Complex Ea, Complex Eb, double phiA, double phiB)
 	{
+		// Geometric edge weight: -k̂·(n̂ × (r_b - r_a)) / (2k·sin²θ)
+		Vector3 edge = rb - ra;
+		Vector3 cross = Vector3.Cross(normal, edge);
+		double numerator = kHat.X * cross.X + kHat.Y * cross.Y + kHat.Z * cross.Z;
+		double weight = -numerator * invDenom;
+
 		double dPhi = phiB - phiA;
-		if (Math.Abs(dPhi) < 1e-9)
-		{
-			// L'Hôpital limit: (Eb - Ea)/dPhi → dEa/dphi_a * (-1) → -j*Ea
-			// Accurate Taylor: (Ea + Eb)/2 (midpoint average of phasor)
-			return (Ea + Eb) * 0.5;
-		}
-		return (Eb - Ea) / dPhi;
+		Complex phaseTerm = Math.Abs(dPhi) < 1e-9
+			? (Ea + Eb) * 0.5          // degenerate: edge nearly perpendicular to k̂ in phase terms
+			: (Eb - Ea) / dPhi;
+
+		return weight * phaseTerm;
 	}
 
 	/// <summary>

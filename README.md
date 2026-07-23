@@ -31,7 +31,7 @@ The system provides interactive 3D visualization, enabling analysis of radar sig
 ## Core Features
 
 * **High-Fidelity RCS Computation**
-  * Physical Optics using an exact planar-polygon phase integral (Stokes'-theorem boundary formulation, replacing the earlier Ling–Lee–Chuang centroid-based approach in v1.2.2)
+  * Physical Optics using an exact planar-polygon phase integral (Stokes'-theorem boundary formulation, replacing the earlier Ling–Lee–Chuang centroid-based approach in v1.2.1)
   * Edge diffraction using UTD/PTD-inspired models with Fresnel transition functions
   * Coherent phase-based summation across surfaces and edges
   * Broadside limit handling for constant-phase facets

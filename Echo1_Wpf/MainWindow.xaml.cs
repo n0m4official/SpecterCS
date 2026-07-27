@@ -17,6 +17,9 @@ using System.Windows.Threading;
 
 namespace Echo1.Wpf;
 
+// This file controls everything and I hate that this is how the project ended up, I cannot touch or move anything without the whole thing throwing 50 errors.
+// So cursed as this is, i'm leaving it bc it works.
+
 public partial class MainWindow : Window
 {
 	// Application state

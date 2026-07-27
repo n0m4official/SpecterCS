@@ -216,6 +216,17 @@ If you're looking for these, they're planned but not built — don't spend time 
 * No time-domain or transient simulation
 
 ---
+## Releases
+
+| Release  | Date | Status | Notes |
+| ------------- | ------------- | ------------- | ------------- |
+| [v1.0.0](https://github.com/n0m4official/SpecterCS/releases/tag/V1.0.0) | March 24, 2026 | Not supported | Initial release |
+| [v1.1.0](https://github.com/n0m4official/SpecterCS/releases/tag/V1.1.0) | April 1, 2026 | Not supported | Core Physics and Kernel Corrections, Material and Radar Absorbent Coatings, Engine and UI Improvements |
+| [v1.1.1](https://github.com/n0m4official/SpecterCS/releases/tag/V1.1.1) | April 1, 2026 | Not supported | Emergency physics patch for v1.1.0 |
+| [v1.2.1](https://github.com/n0m4official/SpecterCS/releases/tag/V1.2.1) | May 13, 2026 | Not supported | Added Aluminum and Titanium alloys to materials |
+| [v1.2.2](https://github.com/n0m4official/SpecterCS/releases/tag/V1.2.2) | July 4, 2026 | Latest | Reworked `PhysicalOpticsKernel` |
+
+---
 
 ## Roadmap
 

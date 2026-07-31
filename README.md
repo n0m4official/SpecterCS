@@ -239,6 +239,7 @@ If you're looking for these, they're planned but not built — don't spend time 
 
 **Planned:**
 * [ ] Fix OBJ import inflation and first-load RCS bug
+* [ ] Implement import for STEP files for higher LOD models
 * [ ] Bi-directional multiphysics coupling (EM–thermal–fluid)
 * [ ] Non-linear, spatially-variant surface impedance (Zs) boundaries
 * [ ] Fluidic-embedded substrate homogenization

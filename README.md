@@ -6,7 +6,7 @@
 
 #### A note on development pace
 
-This project is developed in my spare time alongside full-time post-secondary studies (and, as of mid-2026, a capstone thesis). Development is driven by learning objectives, research interest, and available time, so updates are irregular in cadence but not in seriousness — every release fixes or improves the actual electromagnetic modeling, not just UI polish. See [Status](#status) below for what's currently open.
+This project is developed in my spare time alongside full-time post-secondary studies (as of mid-2026, a capstone thesis) in addition to starting of military training and service. Development is driven by learning objectives, research interest, and available time, so updates are irregular in cadence but not in seriousness — every release fixes or improves the actual electromagnetic modeling, not just UI polish. See [Status](#status) below for what's currently open.
 
 ---
 

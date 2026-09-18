@@ -2,6 +2,8 @@
 
 ### *RCS Simulation Platform — "Reveal the Invisible."*
 
+#### **Current Status: Hiatus (as of September 13, 2026)**
+
 **Current Release: v1.3.0** ([full changelog](https://github.com/n0m4official/SpecterRCS/releases))
 
 #### A note on development pace
